@@ -13,11 +13,15 @@ def get_config():
     return lletres_opcionals, lletra_obligatoria, lletres
 
 
-def get_combs(lletres, max_group=5):
+def get_combs(lletres, max_group=2):
+    print('Generant combinacions...')
     combs = lletres
-    for i in range(1, max_group + 1):
-        combs += [''.join(elem) for elem in itertools.permutations(lletres, i)]
-    return combs
+    if max_group == 1:
+        return lletres
+    else:
+        for i in range(2, max_group + 1):
+            combs += [''.join(elem) for elem in itertools.permutations(lletres, i)]
+        return combs
 
 
 def get_all_words(combs):
@@ -25,7 +29,8 @@ def get_all_words(combs):
     url = 'https://dlc.iec.cat/Results?DecEntradaText={}&AllInfoMorf=False&OperEntrada=1&OperDef=0&OperEx=0&OperSubEntrada=0&OperAreaTematica=0&InfoMorfType=0&OperCatGram=False&AccentSen=False&CurrentPage=0&refineSearch=0&Actualitzacions=False'
     for lletra in combs:
         req = requests.get(url.format(lletra)).text
-        for elem in BeautifulSoup(req).find_all('a', {'class': 'resultAnchor'}):
+        req = BeautifulSoup(req, 'html.parser').find_all('a', {'class': 'resultAnchor'})
+        for elem in req:
             elem = elem.getText().replace(' ', '')
             solucio.append(elem)
     return set(solucio)
